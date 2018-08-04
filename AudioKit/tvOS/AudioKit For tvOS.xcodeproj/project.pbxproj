@@ -1034,7 +1034,6 @@
 		EAF71D8720248B650018946B /* AKAudioEffect.mm in Sources */ = {isa = PBXBuildFile; fileRef = EAF71D8320248B640018946B /* AKAudioEffect.mm */; };
 		EAF71D8820248B650018946B /* AKAudioEffect.h in Headers */ = {isa = PBXBuildFile; fileRef = EAF71D8420248B640018946B /* AKAudioEffect.h */; };
 		EAF9C9891C69A4FC00C10CCE /* AKDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF9C9881C69A4FC00C10CCE /* AKDevice.swift */; };
-		EAFECEF51F4EC33300A2B046 /* AudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4BDE8391C12FFBC00207DA9 /* AudioKit.framework */; };
 		EAFECF0E1F4EC4C000A2B046 /* AKMicrophone.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFECF071F4EC4BF00A2B046 /* AKMicrophone.swift */; };
 		EAFECF0F1F4EC4C000A2B046 /* AKStereoInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAFECF081F4EC4BF00A2B046 /* AKStereoInput.swift */; };
 		EAFECF101F4EC4C000A2B046 /* AKOfflineRenderAudioUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = EAFECF0B1F4EC4C000A2B046 /* AKOfflineRenderAudioUnit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1056,16 +1055,6 @@
 		FE8FE9CE20E42BBC00F15B7E /* AKDiskStreamerAudioUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = FE8FE9CA20E42BBC00F15B7E /* AKDiskStreamerAudioUnit.mm */; };
 		FE8FE9CF20E42BBC00F15B7E /* AKDiskStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8FE9CB20E42BBC00F15B7E /* AKDiskStreamer.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		EAFECEF21F4EC32D00A2B046 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C4BDE8301C12FFBC00207DA9 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C4BDE8381C12FFBC00207DA9;
-			remoteInfo = AudioKit;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		34F5A363205ED22C00290001 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -2156,7 +2145,6 @@
 		EAF71D8320248B640018946B /* AKAudioEffect.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AKAudioEffect.mm; sourceTree = "<group>"; };
 		EAF71D8420248B640018946B /* AKAudioEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKAudioEffect.h; sourceTree = "<group>"; };
 		EAF9C9881C69A4FC00C10CCE /* AKDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AKDevice.swift; sourceTree = "<group>"; };
-		EAFECEEA1F4EC31400A2B046 /* AudioKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AudioKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAFECEED1F4EC31400A2B046 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EAFECF071F4EC4BF00A2B046 /* AKMicrophone.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AKMicrophone.swift; sourceTree = "<group>"; };
 		EAFECF081F4EC4BF00A2B046 /* AKStereoInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AKStereoInput.swift; sourceTree = "<group>"; };
@@ -2185,14 +2173,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EAFECEE61F4EC31400A2B046 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EAFECEF51F4EC33300A2B046 /* AudioKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4335,7 +4315,6 @@
 			isa = PBXGroup;
 			children = (
 				C4BDE8391C12FFBC00207DA9 /* AudioKit.framework */,
-				EAFECEEA1F4EC31400A2B046 /* AudioKitUI.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -5116,13 +5095,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EAFECEE71F4EC31400A2B046 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -5144,25 +5116,6 @@
 			productReference = C4BDE8391C12FFBC00207DA9 /* AudioKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		EAFECEE91F4EC31400A2B046 /* AudioKitUI */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = EAFECEEF1F4EC31400A2B046 /* Build configuration list for PBXNativeTarget "AudioKitUI" */;
-			buildPhases = (
-				EAFECEE51F4EC31400A2B046 /* Sources */,
-				EAFECEE61F4EC31400A2B046 /* Frameworks */,
-				EAFECEE71F4EC31400A2B046 /* Headers */,
-				EAFECEE81F4EC31400A2B046 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				EAFECEF31F4EC32D00A2B046 /* PBXTargetDependency */,
-			);
-			name = AudioKitUI;
-			productName = AudioKitUI;
-			productReference = EAFECEEA1F4EC31400A2B046 /* AudioKitUI.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -5176,10 +5129,6 @@
 					C4BDE8381C12FFBC00207DA9 = {
 						CreatedOnToolsVersion = 7.2;
 						LastSwiftMigration = 0900;
-					};
-					EAFECEE91F4EC31400A2B046 = {
-						CreatedOnToolsVersion = 9.0;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -5196,7 +5145,6 @@
 			projectRoot = "";
 			targets = (
 				C4BDE8381C12FFBC00207DA9 /* AudioKit */,
-				EAFECEE91F4EC31400A2B046 /* AudioKitUI */,
 			);
 		};
 /* End PBXProject section */
@@ -5210,13 +5158,6 @@
 				C49B1DD8204A0CFA009C7C8E /* LICENSE.txt in Resources */,
 				B1468E3F20D070450030BA66 /* README.md in Resources */,
 				C44EA26F201870EC0072399F /* README.md in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EAFECEE81F4EC31400A2B046 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5959,22 +5900,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EAFECEE51F4EC31400A2B046 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		EAFECEF31F4EC32D00A2B046 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C4BDE8381C12FFBC00207DA9 /* AudioKit */;
-			targetProxy = EAFECEF21F4EC32D00A2B046 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C4BDE83F1C12FFBC00207DA9 /* Debug */ = {
@@ -6142,76 +6068,6 @@
 			};
 			name = Release;
 		};
-		EAFECEF01F4EC31400A2B046 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = AudioKitUI/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				PRODUCT_BUNDLE_IDENTIFIER = io.audiokit.AudioKitUI;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-			};
-			name = Debug;
-		};
-		EAFECEF11F4EC31400A2B046 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = AudioKitUI/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				PRODUCT_BUNDLE_IDENTIFIER = io.audiokit.AudioKitUI;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -6229,15 +6085,6 @@
 			buildConfigurations = (
 				C4BDE8421C12FFBC00207DA9 /* Debug */,
 				C4BDE8431C12FFBC00207DA9 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		EAFECEEF1F4EC31400A2B046 /* Build configuration list for PBXNativeTarget "AudioKitUI" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EAFECEF01F4EC31400A2B046 /* Debug */,
-				EAFECEF11F4EC31400A2B046 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
