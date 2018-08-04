@@ -6,7 +6,7 @@
 //  Copyright © 2018 AudioKit. All rights reserved.
 //
 
-import Foundation
+import AudioKit
 
 @IBDesignable open class AKCoarseFineSlider: UIView {
 
@@ -52,8 +52,8 @@ import Foundation
             }
         }
     }
-    public var callback: (Double) -> Void = {val in
-        AKLog(val)
+    public var callback: (Double) -> Void = { val in
+        AKLog("callack with \(val)")
     }
     public func reset(to value: Double) {
         setStable(value: value)

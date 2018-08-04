@@ -6,6 +6,8 @@
 //  Copyright © 2018 AudioKit. All rights reserved.
 //
 
+import AudioKit
+
 extension Notification.Name {
     static let IAAConnected = Notification.Name(rawValue: "IAAConnected")
     static let IAADisconnected = Notification.Name(rawValue: "IAADisconnected")

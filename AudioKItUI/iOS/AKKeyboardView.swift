@@ -5,6 +5,8 @@
 //  Created by Aurelius Prochazka, revision history on Github.
 //  Copyright © 2018 AudioKit. All rights reserved.
 //
+
+import AudioKit
 import UIKit
 
 /// Delegate for keyboard events
@@ -251,7 +253,7 @@ import UIKit
                 // verify that there isn't still a touch remaining on same key from another finger
                 if var otherTouches = event?.allTouches {
                     otherTouches.remove(touch)
-                    if ❗️notesFromTouches(otherTouches).contains(note) {
+                    if !notesFromTouches(otherTouches).contains(note) {
                         pressRemoved(note, touches: event?.allTouches)
                     }
                 }
@@ -281,13 +283,13 @@ import UIKit
     // MARK: - Executing Key Presses
 
     private func pressAdded(_ newNote: MIDINoteNumber) {
-        if ❗️polyphonicMode {
+        if !polyphonicMode {
             for key in onKeys where key != newNote {
                 pressRemoved(key)
             }
         }
 
-        if ❗️onKeys.contains(newNote) {
+        if !onKeys.contains(newNote) {
             onKeys.insert(newNote)
             delegate?.noteOn(note: newNote)
         }
@@ -300,7 +302,7 @@ import UIKit
         }
         onKeys.remove(note)
         delegate?.noteOff(note: note)
-        if ❗️polyphonicMode {
+        if !polyphonicMode {
             // in mono mode, replace with note from highest remaining touch, if it exists
             var remainingNotes = notesFromTouches(touches ?? Set<UITouch>())
             remainingNotes = remainingNotes.filter { $0 != note }

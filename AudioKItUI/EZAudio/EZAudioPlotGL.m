@@ -26,7 +26,7 @@
 #import "AudioKit/EZAudio.h"
 #import "EZAudioPlotGL.h"
 #import "EZAudioDisplayLink.h"
-#import "EZAudioUtilities.h"
+#import "AudioKit/EZAudioUtilities.h"
 #import "EZAudioPlot.h"
 
 //------------------------------------------------------------------------------

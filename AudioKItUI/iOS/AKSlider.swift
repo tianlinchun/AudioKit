@@ -6,6 +6,8 @@
 //  Copyright © 2018 AudioKit. All rights reserved.
 //
 
+import AudioKit
+
 /// Different looks the slider can have
 public enum AKSliderStyle {
     /// Uses a circle for the touch point

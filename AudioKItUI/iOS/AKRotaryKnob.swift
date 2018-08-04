@@ -6,6 +6,7 @@
 //  Copyright © 2018 AudioKit. All rights reserved.
 //
 
+import AudioKit
 import UIKit
 
 /// Style of knob to use

@@ -6,6 +6,8 @@
 //  Copyright © 2018 AudioKit. All rights reserved.
 //
 
+import AudioKit
+
 /// Plot the FFT output from any node in an signal processing graph
 @IBDesignable
 open class AKNodeFFTPlot: EZAudioPlot, EZAudioFFTDelegate {
