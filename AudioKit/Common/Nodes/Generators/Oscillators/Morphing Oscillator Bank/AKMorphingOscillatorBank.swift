@@ -51,10 +51,11 @@ open class AKMorphingOscillatorBank: AKPolyphonicNode, AKComponent {
     /// Index of the wavetable to use (fractional are okay).
     @objc open dynamic var index: Double = 0.0 {
         willSet {
-            if attackDuration != newValue {
+            if index != newValue {
                 if internalAU?.isSetUp ?? false {
                     if let existingToken = token {
                         indexParameter?.setValue(Float(newValue), originator: existingToken)
+                        return
                     }
                 } else {
                     internalAU?.index = Float(newValue)
@@ -169,7 +170,7 @@ open class AKMorphingOscillatorBank: AKPolyphonicNode, AKComponent {
     // MARK: - Initialization
 
     /// Initialize the oscillator with defaults
-    public convenience override init() {
+    @objc public convenience override init() {
         self.init(waveformArray: [AKTable(.triangle), AKTable(.square), AKTable(.sine), AKTable(.sawtooth)])
     }
 
@@ -212,6 +213,7 @@ open class AKMorphingOscillatorBank: AKPolyphonicNode, AKComponent {
 
         super.init()
         AVAudioUnit._instantiate(with: _Self.ComponentDescription) { [weak self] avAudioUnit in
+            self?.avAudioUnit = avAudioUnit
             self?.avAudioNode = avAudioUnit
             self?.midiInstrument = avAudioUnit as? AVAudioUnitMIDIInstrument
             self?.internalAU = avAudioUnit.auAudioUnit as? AKAudioUnitType

@@ -13,7 +13,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <algorithm>
-
+#import "AKInterop.h"
 /**
  Base class for DSPKernels. Many of the methods are virtual, because the base AudioUnit class
  does not know the type of the subclass at compile time.
@@ -92,7 +92,7 @@ public:
     virtual bool isPlaying() { return _playing; }
     virtual bool isSetup() { return _initialized; }
 
-
+    virtual void handleMIDIEvent(AUMIDIEvent const& midiEvent) {}
     /**
      Handles the event list processing and rendering loop. Should be called from AU renderBlock
      From Apple Example code

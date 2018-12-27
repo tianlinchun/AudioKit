@@ -31,6 +31,7 @@ extension AKAudioUnitManager {
                                                           "AKLowShelfParametricEqualizerFilter",
                                                           "AKModalResonanceFilter",
                                                           "AKMoogLadder",
+                                                          "AKPanner",
                                                           "AKPeakingParametricEqualizerFilter",
                                                           "AKResonantFilter",
                                                           "AKRolandTB303Filter",
@@ -171,6 +172,8 @@ extension AKAudioUnitManager {
             node = AKModalResonanceFilter()
         case "AKMoogLadder":
             node = AKMoogLadder()
+        case "AKPanner":
+            node = AKPanner()
         case "AKPeakingParametricEqualizerFilter":
             node = AKPeakingParametricEqualizerFilter()
         case "AKResonantFilter":
@@ -213,6 +216,6 @@ extension AKAudioUnitManager {
             return nil
         }
         (node as? AKToggleable)?.start()
-        return node?.avAudioNode as? AVAudioUnit
+        return node?.avAudioUnit
     }
 }

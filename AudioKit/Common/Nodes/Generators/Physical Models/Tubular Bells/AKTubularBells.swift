@@ -80,6 +80,7 @@ open class AKTubularBells: AKNode, AKToggleable, AKComponent {
         super.init()
         AVAudioUnit._instantiate(with: _Self.ComponentDescription) { [weak self] avAudioUnit in
 
+            self?.avAudioUnit = avAudioUnit
             self?.avAudioNode = avAudioUnit
             self?.internalAU = avAudioUnit.auAudioUnit as? AKAudioUnitType
         }
@@ -103,8 +104,8 @@ open class AKTubularBells: AKNode, AKToggleable, AKComponent {
                 // value observing, but if you need to, this is where that goes.
             }
         })
-        internalAU?.frequency = Float(frequency)
-        internalAU?.amplitude = Float(amplitude)
+        internalAU?.frequency = frequency
+        internalAU?.amplitude = amplitude
     }
 
     /// Trigger the sound with an optional set of parameters

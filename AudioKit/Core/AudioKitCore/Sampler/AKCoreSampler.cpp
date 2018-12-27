@@ -20,6 +20,9 @@
 // MIDI offers 128 distinct note numbers
 #define MIDI_NOTENUMBERS 128
 
+// Convert MIDI note to Hz, for 12-tone equal temperament
+#define NOTE_HZ(midiNoteNumber) ( 440.0f * pow(2.0f, ((midiNoteNumber) - 69.0f)/12.0f) )
+
 struct AKCoreSampler::_Internal {
     // list of (pointers to) all loaded samples
     std::list<AudioKitCore::KeyMappedSampleBuffer*> sampleBufferList;
@@ -37,6 +40,9 @@ struct AKCoreSampler::_Internal {
     AudioKitCore::FunctionTableOscillator vibratoLFO;
     
     AudioKitCore::SustainPedalLogic pedalLogic;
+    
+    // tuning table
+    float tuningTable[128];
 };
 
 AKCoreSampler::AKCoreSampler()
@@ -51,8 +57,10 @@ AKCoreSampler::AKCoreSampler()
 , isLegato(false)
 , portamentoRate(1.0f)
 , cutoffMultiple(4.0f)
+, keyTracking(1.0f)
 , cutoffEnvelopeStrength(20.0f)
-, linearResonance(1.0f)
+, filterEnvelopeVelocityScaling(0.0f)
+, linearResonance(0.5f)
 , loopThruRelease(false)
 , stoppingAllVoices(false)
 , _private(new _Internal)
@@ -65,6 +73,9 @@ AKCoreSampler::AKCoreSampler()
         pVoice->noteFrequency = 0.0f;
         pVoice->glideSecPerOctave = &glideRate;
     }
+    
+    for (int i=0; i < 128; i++)
+        _private->tuningTable[i] = NOTE_HZ(i);
 }
 
 AKCoreSampler::~AKCoreSampler()
@@ -153,6 +164,11 @@ AudioKitCore::KeyMappedSampleBuffer *AKCoreSampler::lookupSample(unsigned noteNu
     return 0;
 }
 
+void AKCoreSampler::setNoteFrequency(int noteNumber, float noteFrequency)
+{
+    _private->tuningTable[noteNumber] = noteFrequency;
+}
+
 // re-compute keyMap[] so every MIDI note number is automatically mapped to the sample buffer
 // closest in pitch
 void AKCoreSampler::buildSimpleKeyMap()
@@ -164,11 +180,13 @@ void AKCoreSampler::buildSimpleKeyMap()
     
     for (int nn=0; nn < MIDI_NOTENUMBERS; nn++)
     {
+        float noteFreq = _private->tuningTable[nn];
+        
         // scan loaded samples to find the minimum distance to note nn
-        int minDistance = MIDI_NOTENUMBERS;
+        float minDistance = 1000000.0f;
         for (AudioKitCore::KeyMappedSampleBuffer *pBuf : _private->sampleBufferList)
         {
-            int distance = abs(pBuf->noteNumber - nn);
+            float distance = fabsf(NOTE_HZ(pBuf->noteNumber) - noteFreq);
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -178,7 +196,7 @@ void AKCoreSampler::buildSimpleKeyMap()
         // scan again to add only samples at this distance to the list for note nn
         for (AudioKitCore::KeyMappedSampleBuffer *pBuf : _private->sampleBufferList)
         {
-            int distance = abs(pBuf->noteNumber - nn);
+            float distance = fabsf(NOTE_HZ(pBuf->noteNumber) - noteFreq);
             if (distance == minDistance)
             {
                 _private->keyMap[nn].push_back(pBuf);
@@ -197,9 +215,12 @@ void AKCoreSampler::buildKeyMap(void)
     
     for (int nn=0; nn < MIDI_NOTENUMBERS; nn++)
     {
+        float noteFreq = _private->tuningTable[nn];
         for (AudioKitCore::KeyMappedSampleBuffer *pBuf : _private->sampleBufferList)
         {
-            if (nn >= pBuf->minimumNoteNumber && nn <= pBuf->maximumNoteNumber)
+            float minFreq = NOTE_HZ(pBuf->minimumNoteNumber);
+            float maxFreq = NOTE_HZ(pBuf->maximumNoteNumber);
+            if (noteFreq >= minFreq && noteFreq <= maxFreq)
                 _private->keyMap[nn].push_back(pBuf);
         }
     }
@@ -259,7 +280,7 @@ void AKCoreSampler::play(unsigned noteNumber, unsigned velocity, float noteFrequ
             if (pVoice->noteNumber >= 0)
             {
                 //printf("restart %d as %d\n", pVoice->noteNumber, noteNumber);
-                pVoice->restart(noteNumber, sampleRate, noteFrequency);
+                pVoice->restartNewNoteLegato(noteNumber, sampleRate, noteFrequency);
             }
             else
             {
@@ -276,7 +297,10 @@ void AKCoreSampler::play(unsigned noteNumber, unsigned velocity, float noteFrequ
             AudioKitCore::SamplerVoice *pVoice = &_private->voice[0];
             AudioKitCore::KeyMappedSampleBuffer *pBuf = lookupSample(noteNumber, velocity);
             if (pBuf == 0) return;  // don't crash if someone forgets to build map
-            pVoice->start(noteNumber, sampleRate, noteFrequency, velocity / 127.0f, pBuf);
+            if (pVoice->noteNumber >= 0)
+                pVoice->restartNewNote(noteNumber, sampleRate, noteFrequency, velocity / 127.0f, pBuf);
+            else
+                pVoice->start(noteNumber, sampleRate, noteFrequency, velocity / 127.0f, pBuf);
             lastPlayedNoteNumber = noteNumber;
             return;
         }
@@ -289,7 +313,7 @@ void AKCoreSampler::play(unsigned noteNumber, unsigned velocity, float noteFrequ
         if (pVoice)
         {
             // re-start the note
-            pVoice->restart(velocity / 127.0f, lookupSample(noteNumber, velocity));
+            pVoice->restartSameNote(velocity / 127.0f, lookupSample(noteNumber, velocity));
             //printf("Restart note %d as %d\n", noteNumber, pVoice->noteNumber);
             return;
         }
@@ -317,8 +341,6 @@ void AKCoreSampler::play(unsigned noteNumber, unsigned velocity, float noteFrequ
     }
 }
 
-#define NOTE_HZ(midiNoteNumber) ( 440.0f * pow(2.0f, ((midiNoteNumber) - 69.0f)/12.0f) )
-
 void AKCoreSampler::stop(unsigned noteNumber, bool immediate)
 {
     //printf("stopNote nn=%d %s\n", noteNumber, immediate ? "immediate" : "release");
@@ -335,13 +357,16 @@ void AKCoreSampler::stop(unsigned noteNumber, bool immediate)
     {
         int key = _private->pedalLogic.firstKeyDown();
         if (key < 0) pVoice->release(loopThruRelease);
-        else if (isLegato) pVoice->restart((unsigned)key, sampleRate, NOTE_HZ(key));
+        else if (isLegato) pVoice->restartNewNoteLegato((unsigned)key, sampleRate, _private->tuningTable[key]);
         else
         {
             unsigned velocity = 100;
             AudioKitCore::KeyMappedSampleBuffer *pBuf = lookupSample(key, velocity);
             if (pBuf == 0) return;  // don't crash if someone forgets to build map
-            pVoice->start(key, sampleRate, NOTE_HZ(key), velocity / 127.0f, pBuf);
+            if (pVoice->noteNumber >= 0)
+                pVoice->restartNewNote(key, sampleRate, _private->tuningTable[key], velocity / 127.0f, pBuf);
+            else
+                pVoice->start(key, sampleRate, _private->tuningTable[key], velocity / 127.0f, pBuf);
         }
     }
     else
@@ -380,6 +405,8 @@ void AKCoreSampler::render(unsigned channelCount, unsigned sampleCount, float *o
     float pitchDev = this->pitchOffset + vibratoDepth * _private->vibratoLFO.getSample();
     float cutoffMul = isFilterEnabled ? cutoffMultiple : -1.0f;
     
+    bool allowSampleRunout = !(isMonophonic && isLegato);
+
     AudioKitCore::SamplerVoice *pVoice = &_private->voice[0];
     for (int i=0; i < MAX_POLYPHONY; i++, pVoice++)
     {
@@ -387,9 +414,9 @@ void AKCoreSampler::render(unsigned channelCount, unsigned sampleCount, float *o
         if (nn >= 0)
         {
             if (stoppingAllVoices ||
-                pVoice->prepToGetSamples(sampleCount, masterVolume, pitchDev, cutoffMul,
-                                         cutoffEnvelopeStrength, linearResonance) ||
-                pVoice->getSamples(sampleCount, pOutLeft, pOutRight))
+                pVoice->prepToGetSamples(sampleCount, masterVolume, pitchDev, cutoffMul, keyTracking,
+                                         cutoffEnvelopeStrength, filterEnvelopeVelocityScaling, linearResonance) ||
+                (pVoice->getSamples(sampleCount, pOutLeft, pOutRight) && allowSampleRunout))
             {
                 stopNote(nn, true);
             }
@@ -400,6 +427,7 @@ void AKCoreSampler::render(unsigned channelCount, unsigned sampleCount, float *o
 void  AKCoreSampler::setADSRAttackDurationSeconds(float value)
 {
     _private->adsrEnvelopeParameters.setAttackDurationSeconds(value);
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateAmpAdsrParameters();
 }
 
 float AKCoreSampler::getADSRAttackDurationSeconds(void)
@@ -410,6 +438,7 @@ float AKCoreSampler::getADSRAttackDurationSeconds(void)
 void  AKCoreSampler::setADSRDecayDurationSeconds(float value)
 {
     _private->adsrEnvelopeParameters.setDecayDurationSeconds(value);
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateAmpAdsrParameters();
 }
 
 float AKCoreSampler::getADSRDecayDurationSeconds(void)
@@ -420,6 +449,7 @@ float AKCoreSampler::getADSRDecayDurationSeconds(void)
 void  AKCoreSampler::setADSRSustainFraction(float value)
 {
     _private->adsrEnvelopeParameters.sustainFraction = value;
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateAmpAdsrParameters();
 }
 
 float AKCoreSampler::getADSRSustainFraction(void)
@@ -430,6 +460,7 @@ float AKCoreSampler::getADSRSustainFraction(void)
 void  AKCoreSampler::setADSRReleaseDurationSeconds(float value)
 {
     _private->adsrEnvelopeParameters.setReleaseDurationSeconds(value);
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateAmpAdsrParameters();
 }
 
 float AKCoreSampler::getADSRReleaseDurationSeconds(void)
@@ -440,6 +471,7 @@ float AKCoreSampler::getADSRReleaseDurationSeconds(void)
 void  AKCoreSampler::setFilterAttackDurationSeconds(float value)
 {
     _private->filterEnvelopeParameters.setAttackDurationSeconds(value);
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateFilterAdsrParameters();
 }
 
 float AKCoreSampler::getFilterAttackDurationSeconds(void)
@@ -450,6 +482,7 @@ float AKCoreSampler::getFilterAttackDurationSeconds(void)
 void  AKCoreSampler::setFilterDecayDurationSeconds(float value)
 {
     _private->filterEnvelopeParameters.setDecayDurationSeconds(value);
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateFilterAdsrParameters();
 }
 
 float AKCoreSampler::getFilterDecayDurationSeconds(void)
@@ -460,6 +493,7 @@ float AKCoreSampler::getFilterDecayDurationSeconds(void)
 void  AKCoreSampler::setFilterSustainFraction(float value)
 {
     _private->filterEnvelopeParameters.sustainFraction = value;
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateFilterAdsrParameters();
 }
 
 float AKCoreSampler::getFilterSustainFraction(void)
@@ -470,6 +504,7 @@ float AKCoreSampler::getFilterSustainFraction(void)
 void  AKCoreSampler::setFilterReleaseDurationSeconds(float value)
 {
     _private->filterEnvelopeParameters.setReleaseDurationSeconds(value);
+    for (int i = 0; i < MAX_POLYPHONY; i++) _private->voice[i].updateFilterAdsrParameters();
 }
 
 float AKCoreSampler::getFilterReleaseDurationSeconds(void)

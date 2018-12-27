@@ -18,7 +18,7 @@ typedef NS_ENUM(AUParameterAddress, AKVariableDelayParameter) {
 
 #ifndef __cplusplus
 
-void *createVariableDelayDSP(int nChannels, double sampleRate);
+AKDSPRef createVariableDelayDSP(int nChannels, double sampleRate);
 
 #else
 
@@ -50,6 +50,7 @@ public:
     
     void init(int _channels, double _sampleRate) override;
 
+    void clear() override;
     void deinit() override;
 
     void process(AUAudioFrameCount frameCount, AUAudioFrameCount bufferOffset) override;
