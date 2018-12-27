@@ -7,17 +7,21 @@
 //
 
 #ifdef __cplusplus
+#ifdef _WIN32
+#include "AKSampler_Typedefs.h"
+#include <memory>
+#else
 #import "AKSampler_Typedefs.h"
-
 #import <memory>
+#endif
 
 // process samples in "chunks" this size
 #define AKCORESAMPLER_CHUNKSIZE 16
 
 
 namespace AudioKitCore {
-    class SamplerVoice;
-    class KeyMappedSampleBuffer;
+    struct SamplerVoice;
+    struct KeyMappedSampleBuffer;
 }
 
 class AKCoreSampler
@@ -108,10 +112,16 @@ protected:
     
     // multiple of note frequency - 1.0 means cutoff at fundamental
     float cutoffMultiple;
+
+    // key tracking factor: 1.0 means perfect key tracking, 0.0 means none; may be e.g. -2.0 to +2.0
+    float keyTracking;
     
     // how much filter EG adds on top of cutoffMultiple
     float cutoffEnvelopeStrength;
     
+    /// fraction 0.0 - 1.0, scaling note volume's effect on cutoffEnvelopeStrength
+    float filterEnvelopeVelocityScaling;
+
     // resonance [-20 dB, +20 dB] becomes linear [10.0, 0.1]
     float linearResonance;
     

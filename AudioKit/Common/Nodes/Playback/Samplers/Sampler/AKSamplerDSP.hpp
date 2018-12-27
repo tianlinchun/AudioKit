@@ -34,6 +34,8 @@ typedef NS_ENUM(AUParameterAddress, AKSamplerParameter)
     AKSamplerParameterLoopThruRelease,
     AKSamplerParameterMonophonic,
     AKSamplerParameterLegato,
+    AKSamplerParameterKeyTrackingFraction,
+    AKSamplerParameterFilterEnvelopeVelocityScaling,
     
     // ensure this is always last in the list, to simplify parameter addressing
     AKSamplerParameterRampDuration,
@@ -79,7 +81,8 @@ struct AKSamplerDSP : AKDSPBase, AKCoreSampler
 
     void setParameter(uint64_t address, float value, bool immediate) override;
     float getParameter(uint64_t address) override;
-    
+
+    void handleMIDIEvent(AUMIDIEvent const& midiEvent) override;
     void process(AUAudioFrameCount frameCount, AUAudioFrameCount bufferOffset) override;
 };
 

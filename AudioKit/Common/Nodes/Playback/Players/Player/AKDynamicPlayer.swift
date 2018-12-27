@@ -11,7 +11,7 @@ public class AKDynamicPlayer: AKPlayer {
     public private(set) var timePitchNode: AKTimePitch?
 
     /// Rate (rate) ranges from 0.03125 to 32.0 (Default: 1.0 and disabled)
-    public override var rate: Double {
+    public var rate: Double {
         get {
             return timePitchNode?.rate ?? 1
         }
@@ -38,6 +38,10 @@ public class AKDynamicPlayer: AKPlayer {
         }
     }
 
+    internal override var _rate: Double {
+        return rate
+    }
+
     /// Pitch (Cents) ranges from -2400 to 2400 (Default: 0.0 and disabled)
     public var pitch: Double {
         get {
@@ -48,16 +52,19 @@ public class AKDynamicPlayer: AKPlayer {
             if newValue == pitch {
                 return
             }
-            // timePitch is only installed if it is requested. This saves resources.
+            // timePitch is only installed if it is requested. This saves CPU resources.
             if timePitchNode != nil && newValue == 0 {
                 removeTimePitch()
                 return
-            } else if timePitchNode == nil && newValue != 0 {
+            }
+
+            if timePitchNode == nil && newValue != 0 {
                 timePitchNode = AKTimePitch()
                 initialize()
             }
 
             guard let timePitchNode = timePitchNode else { return }
+
             timePitchNode.pitch = newValue
             if timePitchNode.isBypassed && timePitchNode.pitch != 0 {
                 timePitchNode.start()
@@ -67,7 +74,7 @@ public class AKDynamicPlayer: AKPlayer {
 
     // MARK: - Initialization
 
-    internal override func initialize() {
+    internal override func initialize(restartIfPlaying: Bool = true) {
         if let timePitchNode = timePitchNode {
             if timePitchNode.avAudioNode.engine == nil {
                 AudioKit.engine.attach(timePitchNode.avAudioNode)
@@ -76,7 +83,7 @@ public class AKDynamicPlayer: AKPlayer {
             }
         }
 
-        super.initialize()
+        super.initialize(restartIfPlaying: restartIfPlaying)
     }
 
     internal override func connectNodes() {
@@ -84,8 +91,8 @@ public class AKDynamicPlayer: AKPlayer {
 
         if let timePitchNode = timePitchNode, let faderNode = faderNode {
             AudioKit.connect(playerNode, to: timePitchNode.avAudioNode, format: processingFormat)
-            AudioKit.connect(timePitchNode.avAudioNode, to: faderNode.avAudioNode, format: processingFormat)
-            AudioKit.connect(faderNode.avAudioNode, to: mixer, format: processingFormat)
+            AudioKit.connect(timePitchNode.avAudioNode, to: faderNode.avAudioUnitOrNode, format: processingFormat)
+            AudioKit.connect(faderNode.avAudioUnitOrNode, to: mixer, format: processingFormat)
             timePitchNode.bypass() // bypass timePitch by default to save CPU
             AKLog(audioFile?.url.lastPathComponent ?? "URL is nil", processingFormat, "Connecting timePitch and fader")
 
@@ -97,8 +104,8 @@ public class AKDynamicPlayer: AKPlayer {
 
         } else if let faderNode = faderNode {
             // if the timePitchNode isn't created connect the player directly to the faderNode
-            AudioKit.connect(playerNode, to: faderNode.avAudioNode, format: processingFormat)
-            AudioKit.connect(faderNode.avAudioNode, to: mixer, format: processingFormat)
+            AudioKit.connect(playerNode, to: faderNode.avAudioUnitOrNode, format: processingFormat)
+            AudioKit.connect(faderNode.avAudioUnitOrNode, to: mixer, format: processingFormat)
             AKLog(audioFile?.url.lastPathComponent ?? "URL is nil", processingFormat, "Connecting fader")
 
         } else {
@@ -109,11 +116,15 @@ public class AKDynamicPlayer: AKPlayer {
 
     private func removeTimePitch() {
         guard let timePitchNode = timePitchNode else { return }
+        let wasPlaying = isPlaying
         stop()
         timePitchNode.disconnectOutput()
         AudioKit.detach(nodes: [timePitchNode.avAudioNode])
         self.timePitchNode = nil
         initialize()
+        if wasPlaying {
+            play()
+        }
     }
 
     public override func play(from startingTime: Double, to endingTime: Double, at audioTime: AVAudioTime?, hostTime: UInt64?) {
